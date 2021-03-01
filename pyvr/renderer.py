@@ -83,14 +83,16 @@ class Renderer(metaclass=ABCMeta):
         self._window.Render()
         iren.Start()
 
-    def render(self, rotate_axis=2, rotate_angles=[0], size=_default_window_size, bg=_default_bg_color):
+    def render(self, rotate_axis=2, rotate_angles=[0], size=_default_window_size, bg=_default_bg_color, alpha_channel=False):
 
         self._make_window(size, bg)
         self._window.OffScreenRenderingOn()
 
         image_filter = vtk.vtkWindowToImageFilter()
         image_filter.SetInput(self._window)
-        rendered_image = np.zeros((len(rotate_angles), size[1], size[0], 3), np.uint8)
+        if alpha_channel:
+            image_filter.SetInputBufferTypeToRGBA()
+        rendered_image = np.zeros((len(rotate_angles), size[1], size[0], 4 if alpha_channel else 3), np.uint8)
 
         for i, angle in enumerate(rotate_angles):
 
